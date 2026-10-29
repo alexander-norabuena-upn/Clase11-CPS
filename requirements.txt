@@ -1,0 +1,2 @@
+# Dependencias de ejecución (versiones fijadas)
+Flask==3.1.3
