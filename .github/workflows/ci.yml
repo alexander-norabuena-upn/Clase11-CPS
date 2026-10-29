@@ -37,7 +37,7 @@ jobs:
       # TODO 3: publica la carpeta reportes/ como artefacto "evidencias-pruebas"
       #         incluso si las pruebas fallan (pista: if: always()).
       
-     - name: Publicar evidencias
+      - name: Publicar evidencias
         if: always()
         uses: actions/upload-artifact@v6
         with:
