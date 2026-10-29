@@ -1,0 +1,57 @@
+# Pipeline de integración continua de RQ Envíos (caso ficticio con fines didácticos).
+# CÓDIGO DE PARTIDA: completa los TODO siguiendo la guía de laboratorio.
+name: ci-rq-envios
+
+on:
+  push:
+    branches: [main]
+  # TODO 1: ejecuta también el pipeline en cada pull request hacia main.
+  pull_request:
+    branches: [main]
+
+jobs:
+  pruebas:
+    name: Pruebas unitarias y de API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v6
+
+      - name: Preparar Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      # TODO 2: ejecuta pytest generando reportes/junit.xml y reportes/cobertura.xml
+      #         y haz que el job falle si la cobertura es menor que 80 %.
+      - name: Ejecutar pruebas con cobertura (quality gate 80 %)
+        run: >
+          pytest --junitxml=reportes/junit.xml
+          --cov=app --cov-report=xml:reportes/cobertura.xml
+          --cov-fail-under=80
+
+
+      # TODO 3: publica la carpeta reportes/ como artefacto "evidencias-pruebas"
+      #         incluso si las pruebas fallan (pista: if: always()).
+      
+     - name: Publicar evidencias
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: evidencias-pruebas
+          path: reportes/
+  desplegar-staging:
+    needs: pruebas
+    if: github.event_name == 'push'
+
+
+  desplegar-staging:
+    name: Despliegue simulado a staging
+    runs-on: ubuntu-latest
+    # Encuentra el defecto: ¿qué falta para que este job espere a las pruebas?
+    steps:
+      - name: Simular despliegue
+        run: echo "Despliegue simulado de ${{ github.sha }} a staging (sin servidor real)."
