@@ -33,25 +33,22 @@ jobs:
           --cov=app --cov-report=xml:reportes/cobertura.xml
           --cov-fail-under=80
 
-
       # TODO 3: publica la carpeta reportes/ como artefacto "evidencias-pruebas"
       #         incluso si las pruebas fallan (pista: if: always()).
-      
       - name: Publicar evidencias
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: evidencias-pruebas
           path: reportes/
-  desplegar-staging:
-    needs: pruebas
-    if: github.event_name == 'push'
-
 
   desplegar-staging:
     name: Despliegue simulado a staging
     runs-on: ubuntu-latest
-    # Encuentra el defecto: ¿qué falta para que este job espere a las pruebas?
+    # Defecto corregido: el job espera a que "pruebas" termine con éxito
+    # y solo se despliega en push a main (no en pull requests).
+    needs: pruebas
+    if: github.event_name == 'push'
     steps:
       - name: Simular despliegue
         run: echo "Despliegue simulado de ${{ github.sha }} a staging (sin servidor real)."
